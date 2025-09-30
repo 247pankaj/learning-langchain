@@ -1,10 +1,20 @@
+# Core LangChain packages
+langchain
+langchain-core
 langchain-openai
 langchain-ollama
-langchain-core
 langchain-community
+
+# LangServe
 langserve
-fastapi<0.100
-pydantic<2.0
+
+# FastAPI + Pydantic
+fastapi
+pydantic
+
+# Server & utilities
 uvicorn
 sse-starlette
 python-dotenv
+
+streamlit

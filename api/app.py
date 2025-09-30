@@ -1,17 +1,15 @@
 import os
 import uvicorn
 from fastapi import FastAPI
+from pydantic import BaseModel
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
 from langchain_ollama import OllamaLLM
 from langchain.prompts import ChatPromptTemplate
-from langserve import add_routes
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
-
-# Set OpenAI API key (expects it in .env as OPENAI_API_KEY)
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY", "")
 
 # Initialize FastAPI app
@@ -29,15 +27,34 @@ ollama_model = OllamaLLM(model="gemma3:4b")
 essay_prompt = ChatPromptTemplate.from_template(
     "Write me an essay about {topic} with 100 words."
 )
-
 poem_prompt = ChatPromptTemplate.from_template(
     "Write me a poem about {topic} for a 5-year-old child, limited to 100 words."
 )
 
-# Add LangServe routes
-add_routes(app, openai_model, path="/openai")
-add_routes(app, essay_prompt | openai_model, path="/essay")
-add_routes(app, poem_prompt | ollama_model, path="/poem")
+# --- Pydantic request/response models ---
+class TopicRequest(BaseModel):
+    topic: str
+
+class ResultResponse(BaseModel):
+    result: str
+
+# --- Routes with explicit request/response models ---
+@app.post("/openai", response_model=ResultResponse)
+async def openai_endpoint(req: TopicRequest):
+    output = openai_model.invoke({"input": req.topic})
+    return ResultResponse(result=output)
+
+@app.post("/essay", response_model=ResultResponse)
+async def essay_endpoint(req: TopicRequest):
+    chain = essay_prompt | openai_model
+    output = chain.invoke({"topic": req.topic})
+    return ResultResponse(result=output)
+
+@app.post("/poem", response_model=ResultResponse)
+async def poem_endpoint(req: TopicRequest):
+    chain = poem_prompt | ollama_model
+    output = chain.invoke({"topic": req.topic})
+    return ResultResponse(result=output)
 
 # Run the server
 if __name__ == "__main__":

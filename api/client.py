@@ -10,19 +10,27 @@ poem_topic = st.text_input("Write a poem on:")
 
 # API call to OpenAI essay route
 def get_openai_response(topic: str) -> str:
-    response = requests.post(
-        "http://localhost:8000/essay/invoke",
-        json={"input": {"topic": topic}}
-    )
-    return response.json().get("output", {}).get("content", "No response received.")
+    try:
+        response = requests.post(
+            "http://localhost:8000/essay",
+            json={"topic": topic}  # match FastAPI TopicRequest model
+        )
+        response.raise_for_status()
+        return response.json().get("result", "No response received.")
+    except requests.exceptions.RequestException as e:
+        return f"Error: {e}"
 
 # API call to Ollama poem route
 def get_ollama_response(topic: str) -> str:
-    response = requests.post(
-        "http://localhost:8000/poem/invoke",
-        json={"input": {"topic": topic}}
-    )
-    return response.json().get("output", "No response received.")
+    try:
+        response = requests.post(
+            "http://localhost:8000/poem",
+            json={"topic": topic}  # match FastAPI TopicRequest model
+        )
+        response.raise_for_status()
+        return response.json().get("result", "No response received.")
+    except requests.exceptions.RequestException as e:
+        return f"Error: {e}"
 
 # Display results
 if essay_topic:
