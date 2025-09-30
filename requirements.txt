@@ -1,5 +1,10 @@
-langchain_openai 
-langchain_core
+langchain-openai
+langchain-ollama
+langchain-core
+langchain-community
+langserve
+fastapi<0.100
+pydantic<2.0
+uvicorn
+sse-starlette
 python-dotenv
-streamlit
-langchain_community
