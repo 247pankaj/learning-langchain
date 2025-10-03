@@ -18,3 +18,7 @@ sse-starlette
 python-dotenv
 
 streamlit
+bs4
+pypdf
+chromadb
+faiss-cpu
