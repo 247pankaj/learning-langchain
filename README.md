@@ -20,4 +20,4 @@ This project demonstrates how to run LLaMA2 locally using [Ollama](https://ollam
 - [Ollama installed locally](https://ollama.com/download)
 - LLaMA2 model pulled via Ollama:
   ```bash
-  ollama pull llama2
+  ollama pull llama3
